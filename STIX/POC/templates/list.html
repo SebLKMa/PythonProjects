@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha256-ZT4HPpdCOt2lvDkXokHuhJfdOKSPFLzeAJik5U/Q+l4=" crossorigin="anonymous" />
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>TNO Singapore Blockchain Security Incidents</title>
+    <!-- Bootstrap core CSS
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    -->
+    <!-- Custom styles for this template -->
+    <link href="static/css/jumbotron-narrow.css" rel="stylesheet">
+    <script src="static/js/angular.js"></script>
+    
+    <!-- for STIX Object Table style below -->
+    <style type="text/css">
+        body
+        {
+            font-family: Arial;
+            font-size: 10pt;
+        }
+        table
+        {
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+        table th
+        {
+            background-color: #F7F7F7;
+            color: #333;
+            font-weight: bold;
+        }
+        table th, table td
+        {
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+    
+    <script>
+        angular.module('myApp', [])
+            .controller('HomeCtrl', function($scope, $http) {
+
+                $scope.incident = {};
+                $scope.showAdd = true;
+                $scope.stixIncidents = [];
+                $scope.stixVisible = false;
+
+				$scope.showlist = function(){
+					$http({
+						method: 'POST',
+						url: '/getIncidentList',
+
+					}).then(function(response) {
+						$scope.incidents = response.data;
+						console.log('mm',$scope.incidents);
+					}, function(error) {
+						console.log(error);
+					});
+				}
+                
+                $scope.addIncident = function() {
+
+                    $http({
+                        method: 'POST',
+                        url: '/addIncident',
+                        data: {
+                            incident: $scope.incident
+                        }
+                    }).then(function(response) {
+                        $scope.showlist();
+                        $('#addPopUp').modal('hide')
+                        $scope.incident = {}
+                    }, function(error) {
+                        console.log(error);
+                    });
+                }
+                
+                $scope.editIncident = function(id){
+                    console.log("editIncident:", id);
+					$scope.incident.id = id;					
+					$scope.showAdd = false;
+
+					$http({
+						method: 'POST',
+						url: '/getIncident',
+						data: {id:$scope.incident.id}
+					}).then(function(response) {
+						console.log(response);
+						$scope.incident = response.data;
+						//$('#addPopUp').modal('show')
+                        $('#editPopUp').modal('show')
+					}, function(error) {
+						console.log(error);
+					});
+				}
+                
+				$scope.updateIncident = function(id){
+				
+					$http({
+						method: 'POST',
+						url: '/updateIncident',
+						data: {incident:$scope.incident}
+					}).then(function(response) {
+						console.log(response.data);
+						$scope.showlist();
+						//$('#addPopUp').modal('hide')
+                        $('#editPopUp').modal('show')
+					}, function(error) {
+						console.log(error);
+					});
+				}
+                               
+				$scope.showAddPopUp = function(){
+					$scope.showAdd = true;
+					$scope.incident = {};
+					$('#addPopUp').modal('show')
+				}
+                
+				$scope.confirmDelete = function(id){
+                    console.log("confirmDelete:", id);
+					$scope.deleteIncidentId = id;
+					$('#deleteConfirm').modal('show');
+				}
+				
+				$scope.deleteIncident = function(){
+					
+					$http({
+						method: 'POST',
+						url: '/deleteIncident',
+						data: {id:$scope.deleteIncidentId}
+					}).then(function(response) {
+						console.log(response.data);
+						$scope.deleteIncidentId = '';
+						$scope.showlist();
+						$('#deleteConfirm').modal('hide')
+					}, function(error) {
+						console.log(error);
+					});
+				}
+
+                $scope.generateSTIX = function () {
+                    $scope.stixIncidents =
+                    [
+                    {"id": "example:incident-b26c5658-e229-43a6-a579-d5c4b73aa043"
+                    ,"title": "The Multi-sig Hack"
+                    ,"description": "Parity Wallet Hacked"
+                    ,"timestamp": "2017-11-30T07:00:33.348043+00:00"
+                    ,"confidence": {"timestamp": "2017-12-01T01:54:25.856252+00:00", "timestamp_precision": "second", "value": "High"}
+                    ,"reporter": {
+                      "identity": {"name": "parity technologies ltd"}, 
+                      "description": "https://paritytech.io/blog/security-alert.html", 
+                      "time": {"produced_time": "2017-11-08T00:00:00"}
+                      }
+                    ,"time": {"initial_compromise": "2017-11-06T00:00:00", "incident_discovery": "2017-11-08T00:00:00", "incident_reported": "2017-11-08T00:00:00"}
+                    ,"impact_assessment": {
+                      "effects": ["Estimated Loss of $280m in Ether"]
+                    } 
+                    ,"victims": [{"name": "Cappasity"}, {"name": "Who else ?"}]
+                    }
+                    ];
+                    $scope.stixVisible = true;
+                };
+
+                $scope.showlist();
+            })
+    </script>
+    
+</head>
+
+<body ng-controller="HomeCtrl">
+
+    <div class="container">
+        <div class="header clearfix">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="#" data-toggle="modal" ng-click="showAddPopUp()" >Add Incident</a></li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">TNO Blockchain Security Incidents</h3>
+        </div>
+
+        <div class="bs-example" data-example-id="panel-without-body-with-table">
+            <div class="panel panel-default">
+                <div class="panel-heading">Incidents</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Confidence</th>
+                            <th>Initial Compromise</th>
+                            <th>Incident Discovery</th>
+                            <th>Incident Reported</th>
+                            <th></th>
+                            
+                            <th></th>
+                            
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="incident in incidents track by $index">
+                            <th scope="row">{{'{{$index+1}}'}}</th>
+                            <td>{{ '{{incident.title}}' }}</td>
+                            <td>{{ '{{incident.description}}' }}</td>
+                            <td>{{ '{{incident.confidence}}' }}</td>
+                            
+                            <td>{{'{{incident.initial_compromise}}'}}</td>
+                            <td>{{'{{incident.incident_discovery}}'}}</td>
+                            <td>{{'{{incident.incident_reported}}'}}</td>
+                            
+							<td><span style="cursor:pointer;" ng-click="editIncident(incident.id)" class="glyphicon glyphicon-pencil" aria-hidden="true"></span></td>
+                            <td><span style="cursor:pointer;color:#e43309;" ng-click="confirmDelete(incident.id)" class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>
+                        </tr>
+                    </tbody>
+                    
+                </table>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addPopUp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel" >Add incident</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="txtTitle" class="control-label">Title:</label>
+                                <input type="text" class="form-control" ng-model="incident.title" id="txtTitle">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtDescription" class="control-label">Description:</label>
+                                <input type="text" class="form-control" ng-model="incident.description" id="txtDescription">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtConfidence" class="control-label">Confidence:</label>
+                                <input type="text" class="form-control" ng-model="incident.confidence" id="txtConfidence">
+                            </div>
+                            <div class="form-group">
+                                <label for="dtInitialCompromise" class="control-label">Initial Compromise:</label>
+                                <!--
+                                <input type="text" class="form-control" ng-model="incident.initial_compromise" id="txtInitialCompromise">
+                                -->
+                                <input type="datetime-local" class="form-control" ng-model="incident.initial_compromise" id="dtInitialCompromise">
+                            </div>
+                            <div class="form-group">
+                                <label for="dtIncidentDiscovery" class="control-label">Incident Discovery:</label>
+                                <input type="datetime-local" class="form-control" ng-model="incident.incident_discovery" id="dtIncidentDiscovery">
+                            </div>                                             
+                            <div class="form-group">
+                                <label for="dtIncidentReported" class="control-label">Incident Reported:</label>
+                                <input type="datetime-local" class="form-control" ng-model="incident.incident_reported" id="dtIncidentReported">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"  class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button ng-show="showAdd" id="btnAdd" ng-click="addIncident()" type="button" class="btn btn-primary">Add incident</button>
+                        <button ng-show="!showAdd" id="btnAdd" ng-click="updateIncident()" type="button" class="btn btn-primary">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--
+            TODO: merge with addPopUp when mongodb datetime to angular js datetime input is resolved 
+            Error: [ngModel:datefmt] Expected ... to be a date
+            https://stackoverflow.com/questions/32343250/expected-to-be-a-date-angular-js
+            https://stackoverflow.com/questions/26853173/why-is-my-date-input-field-in-angularjs-throwing-type-error
+        --> 
+         <div class="modal fade" id="editPopUp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel" >Edit incident</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="txtTitle" class="control-label">Title:</label>
+                                <input type="text" class="form-control" ng-model="incident.title" id="txtTitle">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtDescription" class="control-label">Description:</label>
+                                <input type="text" class="form-control" ng-model="incident.description" id="txtDescription">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtConfidence" class="control-label">Confidence:</label>
+                                <input type="text" class="form-control" ng-model="incident.confidence" id="txtConfidence">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"  class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button ng-show="showAdd" id="btnAdd" ng-click="addIncident()" type="button" class="btn btn-primary">Add incident</button>
+                        <button ng-show="!showAdd" id="btnAdd" ng-click="updateIncident()" type="button" class="btn btn-primary">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="deleteConfirm" class="modal fade bs-example-modal-md in" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="myLargeModalLabel">You are about to delete this entry. Do you want to proceed ?</h4> </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" ng-click="deleteIncident()" class="btn btn-primary">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STIX Object Table -->
+        <div class="bs-example" data-example-id="panel-without-body-with-table">
+            <div class="header clearfix">
+                <nav>
+                    <ul class="nav nav-pills pull-right">
+                        <li role="presentation" class="active"><a href="#" data-toggle="modal" ng-click="generateSTIX()" >STIX Object</a></li>
+                    </ul>
+                </nav>
+                <h3 class="text-muted">STIX Object binding to Table</h3>
+            </div>
+            
+            <table cellpadding="0" cellspacing="0" ng-show="stixVisible">
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Confidence</th>
+                    <th>Reporter</th>
+                    <th>Time</th>
+                    <th>Victims</th>
+                    <th>Impact Assessment</th>
+                </tr>
+
+                <tbody ng-repeat="i in stixIncidents">
+                    <tr>
+                        <td>{{'{{i.title}}'}}</td>
+                        <td>{{'{{i.description}}'}}</td>
+                        <td>{{'{{i.confidence.value}}'}}</td>
+                        <td>
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>{{'{{i.reporter.identity.name}}'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{'{{i.reporter.description}}'}}</td>
+                                </tr>
+                            </table>
+                        </td>
+
+                        <td>
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <tr>
+                                        <td>Compromised On: {{'{{i.time.initial_compromise}}'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Discovered On: {{'{{i.time.incident_discovery}}'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reported On: {{'{{i.time.incident_reported}}'}}</td>
+                                    </tr>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                        <td>
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <th>Name</th>
+                                </tr>
+                                
+                                <tbody ng-repeat="v in i.victims">
+                                <tr>
+                                    <td>{{'{{v.name}}'}}</td>
+                                </tr>
+                                </tbody>
+                                
+                            </table>
+                        </td>
+                        
+                        <td>
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <th>Effects</th>
+                                </tr>
+                                
+                                <tbody ng-repeat="e in i.impact_assessment.effects">
+                                <tr>
+                                    <td>{{'{{e}}'}}</td>
+                                </tr>
+                                </tbody>                            
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="static/js/jquery.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        body
+        {
+            font-family: Arial;
+            font-size: 10pt;
+        }
+        table
+        {
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+        table th
+        {
+            background-color: #F7F7F7;
+            color: #333;
+            font-weight: bold;
+        }
+        table th, table td
+        {
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.9/angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module('MyApp', [])
+        app.controller('MyController', function ($scope) {
+            $scope.IsVisible = false;
+            $scope.GenerateTable = function () {
+                $scope.Customers = [
+                {
+                    CustomerId: 1, Name: "John Hammond", Country: "United States",
+                    Orders: [
+                        { OrderId: 10248, Freight: 32.38, ShipCountry: 'France' },
+                        { OrderId: 10249, Freight: 12.43, ShipCountry: 'Japan' },
+                        { OrderId: 10250, Freight: 66.35, ShipCountry: 'Russia' }
+                   ]
+                },
+                {
+                    CustomerId: 2, Name: "Mudassar Khan", Country: "India",
+                    Orders: [
+                        { OrderId: 10266, Freight: 77.0, ShipCountry: 'Argentina' },
+                        { OrderId: 10267, Freight: 101.12, ShipCountry: 'Australia' },
+                        { OrderId: 10268, Freight: 11.61, ShipCountry: 'Germany' }
+                    ]
+                },
+                {
+                    CustomerId: 3, Name: "Suzanne Mathews", Country: "France",
+                    Orders: [{ OrderId: 10250, Freight: 65.83, ShipCountry: 'Brazil'} ]
+                },
+                {
+                    CustomerId: 4, Name: "Robert Schidner", Country: "Russia",
+                    Orders: [
+                        { OrderId: 10233, Freight: 89.11, ShipCountry: 'Belgium' },
+                        { OrderId: 10234, Freight: 51.30, ShipCountry: 'Canada' },
+                        { OrderId: 10235, Freight: 46.11, ShipCountry: 'Austria' }
+                    ]
+                }
+               ];
+                $scope.IsVisible = true;
+            };
+            
+            $scope.GenerateSTIX = function () {
+                $scope.Incidents =
+                [
+                {"id": "example:incident-b26c5658-e229-43a6-a579-d5c4b73aa043"
+                ,"title": "The Multi-sig Hack"
+                ,"description": "Parity Wallet Hacked"
+                ,"timestamp": "2017-11-30T07:00:33.348043+00:00"
+                ,"confidence": {"timestamp": "2017-12-01T01:54:25.856252+00:00", "timestamp_precision": "second", "value": "High"}
+                ,"reporter": {
+                  "identity": {"name": "parity technologies ltd"}, 
+                  "description": "https://paritytech.io/blog/security-alert.html", 
+                  "time": {"produced_time": "2017-11-08T00:00:00"}
+                  }
+                ,"time": {"initial_compromise": "2017-11-06T00:00:00", "incident_discovery": "2017-11-08T00:00:00", "incident_reported": "2017-11-08T00:00:00"}
+                ,"impact_assessment": {
+                  "effects": ["Estimated Loss of $280m in Ether"]
+                } 
+                ,"victims": [{"name": "Cappasity"}, {"name": "Who else ?"}]
+                }
+                ];
+                $scope.IsVisible = true;
+            };
+        });
+    </script>
+<!--
+    <div ng-app="MyApp" ng-controller="MyController">
+        <input type="button" value="Generate Table" ng-click="GenerateTable()" />
+        <hr />
+        <table cellpadding="0" cellspacing="0" ng-show="IsVisible">
+            <tr>
+                <th>Customer Id</th>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Orders</th>
+            </tr>
+            <tbody ng-repeat="c in Customers">
+                <tr>
+                    <td>{{c.CustomerId}}</td>
+                    <td>{{c.Name}}</td>
+                    <td>{{c.Country}}</td>
+                    <td>
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>Order Id</th>
+                                <th>Freight</th>
+                                <th>ShipCountry</th>
+                            </tr>
+                            <tbody ng-repeat="o in c.Orders">
+                            <tr>
+                                <td>{{o.OrderId}}</td>
+                                <td>{{o.Freight}}</td>
+                                <td>{{o.ShipCountry}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+-->
+    <div ng-app="MyApp" ng-controller="MyController">
+        <input type="button" value="Generate STIX" ng-click="GenerateSTIX()" />
+        <hr />
+        <table cellpadding="0" cellspacing="0" ng-show="IsVisible">
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Confidence</th>
+                <th>Reporter</th>
+                <th>Time</th>
+                <th>Victims</th>
+                <th>Impact Assessment</th>
+            </tr>
+            <tbody ng-repeat="i in Incidents">
+                <tr>
+                    <td>{{i.title}}</td>
+                    <td>{{i.description}}</td>
+                    <td>{{i.confidence.value}}</td>
+                    <td>
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>{{i.reporter.identity.name}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{i.reporter.description}}</td>
+                            </tr>
+                        </table>
+                    </td>
+
+                    <td>
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <tr>
+                                    <td>Compromised On: {{i.time.initial_compromise}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Discovered On: {{i.time.incident_discovery}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Reported On: {{i.time.incident_reported}}</td>
+                                </tr>
+                            </tr>
+                        </table>
+                    </td>
+                    
+                    <td>
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>Name</th>
+                            </tr>
+                            
+                            <tbody ng-repeat="v in i.victims">
+                            <tr>
+                                <td>{{v.name}}</td>
+                                <!--
+                                <td>{{o.Freight}}</td>
+                                <td>{{o.ShipCountry}}</td>
+                                -->
+                            </tr>
+                            </tbody>
+                            
+                        </table>
+                    </td>
+                    
+                    <td>
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>Effects</th>
+                            </tr>
+                            
+                            <tbody ng-repeat="e in i.impact_assessment.effects">
+                            <tr>
+                                <td>{{e}}</td>
+                                <!--
+                                <td>{{o.Freight}}</td>
+                                <td>{{o.ShipCountry}}</td>
+                                -->
+                            </tr>
+                            </tbody>                            
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
