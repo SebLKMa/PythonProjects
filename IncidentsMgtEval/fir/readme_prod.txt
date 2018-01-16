@@ -170,6 +170,10 @@ server {
 	}
 }
 
+Make sure you replace FIR.DOMAIN.COM with the host you will be using to host your FIR install. This should match what you specified in the ALLOWED_HOSTS directive in production.py. (This solves error 400 problems as described in https://github.com/certsocietegenerale/FIR/issues/46)
+See also:
+https://github.com/certsocietegenerale/FIR/issues/188
+
 20. Enable the configuration:
 
 $ sudo ln -s /etc/nginx/sites-available/fir /etc/nginx/sites-enabled/fir
