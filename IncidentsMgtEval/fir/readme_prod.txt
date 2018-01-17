@@ -48,6 +48,7 @@ e-mail services and even Web site design and creation services if the customers
 want someone else to build their Web sites.
 
 #ALLOWED_HOSTS = ['FIR.DOMAIN.COM'] to be from web hosting one.com later
+#For local VM using NAT, just use the IP from ifconfig
 ALLOWED_HOSTS = ['127.0.0.1','localhost', '192.168.9.132']
 
 DATABASES = {
@@ -113,7 +114,7 @@ respawn
 
 exec uwsgi --socket /home/sebtno/app/FIR/run/fir.sock --chdir /home/sebtno/app/FIR/ --module fir.wsgi
 
-17.
+17. This section does NOT work!
 To start the daemon, run 
 sudo start fir 
 To restart it, run 
@@ -131,7 +132,7 @@ After=syslog.target
 User=www-data
 Group=www-data
 WorkingDirectory=/home/sebtno/app/FIR/
-ExecStart=/usr/local/bin/uwsgi --socket /home/sebtno/app/FIR/run/fir.sock --chdir /home/sebtno/app/FIR/ --plugins python --module fir.wsgi
+ExecStart=/usr/local/bin/uwsgi --socket /home/sebtno/app/FIR/run/fir.sock --chdir /home/sebtno/app/FIR/ --module fir.wsgi
 Restart=always
 KillSignal=SIGQUIT
 Type=Debug
