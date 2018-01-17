@@ -225,6 +225,13 @@ Jan 16 01:31:41 ubuntu uwsgi[11275]: [pid: 11275|app: 0|req: 1/1] 192.168.9.132 
 Jan 16 01:31:53 ubuntu uwsgi[11275]: [pid: 11275|app: 0|req: 2/2] 127.0.0.1 () {40 vars in 617 bytes} [Tue Jan 16 17:31:53 2018] GET /admin => generate
 
 
+WHEN YOUR VM STARTS WITH BLANK SCREEN
+1. Ctrl+Alt+F1 to enter console mode
+2. Login
+3. sudo apt-get upgrade
+4. sudo restart now or sudo shutdown now
+
+
 
 
 
